@@ -4,6 +4,11 @@ import subprocess
 import tempfile
 import logging
 from pathlib import Path
+import warnings
+
+# Подавляем известные предупреждения PyTorch, исходящие из внутренней реализации библиотеки gigaam
+warnings.filterwarnings("ignore", message=".*weights_only=False.*")
+warnings.filterwarnings("ignore", message=".*The given buffer is not writable.*")
 
 try:
     from agent.transcription_provider import TranscriptionProvider

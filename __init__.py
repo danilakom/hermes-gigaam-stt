@@ -39,30 +39,28 @@ class GigaAMProvider(TranscriptionProvider):
         return "GigaAM (Local)"
 
     def is_available(self) -> bool:
-        # 1. Проверка системного ffmpeg (безопасная, через shutil)
-        if not shutil.which("ffmpeg"):
-            logger.error("[GigaAM] Не найден системный пакет ffmpeg. Установите его через менеджер пакетов вашей ОС (например, 'apt install ffmpeg' или 'brew install ffmpeg').")
-            return False
-            
-        # 2. Проверка Python-зависимостей
-        missing_deps = []
-        for dep in ["gigaam", "yaml", "sounddevice", "numpy"]:
-            try:
-                __import__(dep)
-            except ImportError:
-                # Корректируем имя для pyyaml
-                dep_name = "pyyaml" if dep == "yaml" else dep
-                missing_deps.append(dep_name)
-
-        if missing_deps:
-            deps_str = " ".join(missing_deps)
-            logger.error(
-                f"[GigaAM] Отсутствуют необходимые библиотеки: {deps_str}. "
-                f"Пожалуйста, выполните в терминале: pip install {deps_str}"
-            )
-            return False
-
-        return True
+    # Проверка ffmpeg
+    if not shutil.which("ffmpeg"):
+        print("\033[91m[GigaAM] ❌ ОШИБКА: Не найден системный пакет ffmpeg.\033[0m")
+        print("\033[93m[Подсказка] Установите: sudo apt install ffmpeg\033[0m\n")
+        return False
+    
+    # Проверка Python-зависимостей
+    missing_deps = []
+    for dep in ["gigaam", "yaml", "sounddevice", "numpy"]:
+        try:
+            __import__(dep)
+        except ImportError:
+            dep_name = "pyyaml" if dep == "yaml" else dep
+            missing_deps.append(dep_name)
+    
+    if missing_deps:
+        deps_str = " ".join(missing_deps)
+        print(f"\033[91m[GigaAM] ❌ ОШИБКА: Отсутствуют библиотеки: {deps_str}\033[0m")
+        print(f"\033[93m[Подсказка] Выполните: pip install {deps_str}\033[0m\n")
+        return False
+    
+    return True
 
     def transcribe(self, file_path: str, *, model=None, language=None, **extra) -> dict:
         with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as tmp_wav:

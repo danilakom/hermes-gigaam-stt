@@ -8,7 +8,7 @@
 
 ```bash
 # 1. Установка системных зависимостей (ffmpeg для конвертации, portaudio для записи)
-sudo apt update && sudo apt install ffmpeg portaudio19-dev
+s\udo apt update && s\udo apt install ffmpeg portaudio19-dev
 
 # 2. Установка и активация плагина через менеджер Hermes
 hermes plugins install https://github.com/danilakom/hermes-gigaam-stt

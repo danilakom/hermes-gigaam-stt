@@ -21,7 +21,7 @@ class GigaAMProvider(TranscriptionProvider):
         if self._model is None:
             import gigaam
             logger.info("[GigaAM] Первая транскрибация: загрузка модели в память...")
-            self._model = gigaam.load_model("gigaam")
+            self._model = gigaam.load_model("rnnt")
             logger.info("[GigaAM] Модель успешно загружена!")
         return self._model
 

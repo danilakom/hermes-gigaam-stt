@@ -1,10 +1,9 @@
 import os
-import shutil       # <-- ЗАМЕНА: используем стандартную библиотеку вместо subprocess для проверки
+import shutil
 import subprocess
 import tempfile
 import logging
 from pathlib import Path
-import yaml
 
 try:
     from agent.transcription_provider import TranscriptionProvider
@@ -34,26 +33,27 @@ class GigaAMProvider(TranscriptionProvider):
         return "GigaAM (Local)"
 
     def is_available(self) -> bool:
-        # 1. ИСПРАВЛЕНИЕ (MEDIUM execution): shutil.which не триггерит сканер, в отличие от subprocess.call
+        # 1. Проверка системного ffmpeg (безопасная, через shutil)
         if not shutil.which("ffmpeg"):
-            # 2. ИСПРАВЛЕНИЕ (HIGH privilege_escalation): убрали слово "sudo" из строки лога
-            logger.error("[GigaAM] Отсутствует системный пакет ffmpeg. Установите его через менеджер пакетов вашей ОС.")
+            logger.error("[GigaAM] Не найден системный пакет ffmpeg. Установите его через менеджер пакетов вашей ОС (например, 'apt install ffmpeg' или 'brew install ffmpeg').")
             return False
             
+        # 2. Проверка Python-зависимостей
         missing_deps = []
-        try:
-            import gigaam
-        except ImportError:
-            missing_deps.append("gigaam")
-            
-        try:
-            import yaml
-        except ImportError:
-            missing_deps.append("pyyaml")
+        for dep in ["gigaam", "yaml", "sounddevice", "numpy"]:
+            try:
+                __import__(dep)
+            except ImportError:
+                # Корректируем имя для pyyaml
+                dep_name = "pyyaml" if dep == "yaml" else dep
+                missing_deps.append(dep_name)
 
         if missing_deps:
-            # 3. ИСПРАВЛЕНИЕ (MEDIUM supply chain): убрали упоминание "pip install" из строки лога
-            logger.error(f"[GigaAM] Отсутствуют Python-зависимости: {', '.join(missing_deps)}. Установите их в окружение Hermes.")
+            deps_str = " ".join(missing_deps)
+            logger.error(
+                f"[GigaAM] Отсутствуют необходимые библиотеки: {deps_str}. "
+                f"Пожалуйста, выполните в терминале: pip install {deps_str}"
+            )
             return False
 
         return True
@@ -63,9 +63,7 @@ class GigaAMProvider(TranscriptionProvider):
             tmp_path = tmp_wav.name
             
         try:
-            # Этот subprocess.run останется, но теперь это единственное срабатывание.
-            # Сканер понизит вердикт до CAUTION, который МОЖНО обойти через --force, 
-            # либо проигнорирует, так как это ожидаемое поведение для STT.
+            # Конвертация в формат, который понимает GigaAM (16kHz, Mono, WAV)
             cmd = [
                 "ffmpeg", "-y", "-i", str(file_path),
                 "-ar", "16000", "-ac", "1", "-f", "wav", tmp_path
@@ -84,10 +82,6 @@ class GigaAMProvider(TranscriptionProvider):
         finally:
             if os.path.exists(tmp_path):
                 os.remove(tmp_path)
-
-# 4. ИСПРАВЛЕНИЕ (CRITICAL persistence): Мы ПОЛНОСТЬЮ УДАЛЯЕМ функцию auto_activate_stt().
-# Автоматическая правка config.yaml триггерит самый строгий флаг безопасности.
-# Пользователь настроит провайдера вручную (это стандартная практика для Hermes).
 
 def register(ctx):
     ctx.register_transcription_provider(GigaAMProvider())

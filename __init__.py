@@ -42,7 +42,7 @@ class GigaAMProvider(TranscriptionProvider):
     # Проверка ffmpeg
     if not shutil.which("ffmpeg"):
         print("\033[91m[GigaAM] ❌ ОШИБКА: Не найден системный пакет ffmpeg.\033[0m")
-        print("\033[93m[Подсказка] Установите: sudo apt install ffmpeg\033[0m\n")
+        print("\033[93m[Подсказка] Установите: apt install ffmpeg\033[0m\n")
         return False
     
     # Проверка Python-зависимостей

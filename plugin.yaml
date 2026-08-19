@@ -4,3 +4,5 @@ description: "Локальный STT провайдер на базе GigaAM д�
 pip_dependencies:
   - "gigaam"
   - "pyyaml"
+  - "sounddevice"
+  - "numpy"

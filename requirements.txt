@@ -1,2 +1,4 @@
 gigaam
 pyyaml
+sounddevice
+numpy

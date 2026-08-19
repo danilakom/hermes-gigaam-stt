@@ -1,0 +1,6 @@
+name: gigaam
+version: 1.0.0
+description: "Локальный STT провайдер на базе GigaAM для замены Whisper"
+pip_dependencies:
+  - "gigaam"
+  - "pyyaml"

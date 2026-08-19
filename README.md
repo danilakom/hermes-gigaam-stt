@@ -17,7 +17,7 @@ hermes plugins install https://github.com/danilakom/hermes-gigaam-stt
 source ~/.hermes/hermes-agent/venv/bin/activate (.fish)
 
 # 4. Установка необходимых Python-библиотек в окружение Hermes
-~/.hermes/bin/uv pip install gigaam pyyaml sounddevice numpy
+~/.hermes/bin/uv pip install -r ~/.hermes/plugins/hermes-gigaam-stt/requirements.txt
 
 # 5. Редкатирование config.yaml для активации модели. В ~/.hermes/config.yaml добавьте
 stt:

@@ -58,7 +58,7 @@ class GigaAMProvider(TranscriptionProvider):
             deps_str = " ".join(missing_deps)
             logger.error(
                 f"[GigaAM] Отсутствуют необходимые библиотеки: {deps_str}. "
-                f"Установите отсутствующие пакеты: {deps_str} через ваш пакетчик"
+                f"Пожалуйста, выполните в терминале: pip install {deps_str}"
             )
             return False
 
@@ -74,10 +74,7 @@ class GigaAMProvider(TranscriptionProvider):
                 "ffmpeg", "-y", "-i", str(file_path),
                 "-ar", "16000", "-ac", "1", "-f", "wav", tmp_path
             ]
-            # Конвертация аудио через ffmpeg
-            proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            stdout, stderr = proc.communicate()
-            result = type('obj', (object,), {'returncode': proc.returncode, 'stderr': stderr.decode()})
+            result = subprocess.run(cmd, capture_output=True, text=True)
             if result.returncode != 0:
                 return {"success": False, "transcript": "", "error": f"FFmpeg error: {result.stderr}", "provider": self.name}
             

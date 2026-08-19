@@ -19,7 +19,7 @@ source ~/.hermes/hermes-agent/venv/bin/activate (.fish)
 # 4. Установка необходимых Python-библиотек в окружение Hermes
 ~/.hermes/bin/uv pip install -r ~/.hermes/plugins/hermes-gigaam-stt/requirements.txt
 
-# 5. Редкатирование config.yaml для активации модели. В ~/.hermes/config.yaml добавьте
+# 5. Редкатирование config.yaml для активации модели. В config.yaml добавьте
 stt:
   enabled: true
   language: ru
